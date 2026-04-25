@@ -1,0 +1,21 @@
+k,prompt,ttft_ms,e2e_ms,tpot_ms,tokens,acceptance_rate,speedup_ratio,error,draft_model
+8,The French Revolution began in 1789 and fundamentally changed,474.88,4529.59,92.44,49,0.909,0.0,,Q2_K
+8,Distributed training splits computation across multiple devices to,599.4,7935.38,122.08,65,0.817,0.0,,Q2_K
+8,"Thread affinity pins threads to specific CPU cores, which",599.73,3951.2,119.73,33,0.774,0.0,,Q2_K
+8,"The Battle of Waterloo was fought on 18 June 1815, marking",491.7,7026.22,108.1,65,0.833,0.0,,Q2_K
+8,Neural networks consist of layers of interconnected nodes that,599.94,4850.18,146.98,33,0.742,0.0,,Q2_K
+8,"The internet protocol suite, commonly known as TCP/IP,",604.23,2543.53,77.08,33,0.933,0.0,,Q2_K
+8,Speculative decoding works by using a smaller draft model to,595.8,8418.46,129.51,65,0.787,0.0,,Q2_K
+8,Continuous batching allows the server to add new requests to,596.98,3997.9,121.15,33,0.742,0.0,,Q2_K
+8,Inference latency is affected by both the prefill phase and,599.77,3182.96,64.96,49,0.977,0.0,,Q2_K
+8,The attention mechanism computes a weighted sum of values based on,599.52,2560.37,80.01,32,0.931,0.0,,Q2_K
+8,Memory efficiency in large language models is critical because,599.66,4050.15,122.73,33,0.781,0.0,,Q2_K
+8,The NUMA architecture affects memory access latency because,597.71,3928.4,119.04,33,0.833,0.0,,Q2_K
+8,The transformer architecture was introduced in 2017 and has since,477.49,6109.99,124.69,49,0.822,0.0,,Q2_K
+8,Continuous batching allows the server to add new requests to,596.68,5144.08,104.98,49,0.826,0.0,,Q2_K
+8,Speculative decoding works by using a smaller draft model to,596.48,5719.18,116.72,49,0.804,0.0,,Q2_K
+8,Photosynthesis is the process by which plants convert light energy into,476.82,6324.61,97.3,65,0.85,0.0,,Q2_K
+8,"The Battle of Waterloo was fought on 18 June 1815, marking",493.55,4758.78,97.12,49,0.848,0.0,,Q2_K
+8,"When a user types in an AI-assisted editor, the system must",475.61,3796.85,115.06,33,0.8,0.0,,Q2_K
+8,Reinforcement learning is a type of machine learning in which,599.65,3696.97,75.45,49,0.932,0.0,,Q2_K
+8,The time-to-first-token metric measures how long it takes before,475.94,6074.55,123.97,49,0.787,0.0,,Q2_K

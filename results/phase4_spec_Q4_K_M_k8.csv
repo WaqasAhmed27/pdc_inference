@@ -1,0 +1,21 @@
+k,prompt,ttft_ms,e2e_ms,tpot_ms,tokens,acceptance_rate,speedup_ratio,error,draft_model
+8,The French Revolution began in 1789 and fundamentally changed,609.85,4436.27,90.54,49,0.955,0.0,,Q4_K_M
+8,Distributed training splits computation across multiple devices to,798.59,5392.83,82.97,65,1.0,0.0,,Q4_K_M
+8,"Thread affinity pins threads to specific CPU cores, which",798.92,3258.06,98.73,33,0.931,0.0,,Q4_K_M
+8,"The Battle of Waterloo was fought on 18 June 1815, marking",623.93,7368.68,113.36,65,0.898,0.0,,Q4_K_M
+8,Neural networks consist of layers of interconnected nodes that,801.85,2657.92,80.54,33,0.966,0.0,,Q4_K_M
+8,"The internet protocol suite, commonly known as TCP/IP,",803.01,3327.41,100.83,33,0.933,0.0,,Q4_K_M
+8,Speculative decoding works by using a smaller draft model to,797.82,7369.92,113.38,65,0.915,0.0,,Q4_K_M
+8,Continuous batching allows the server to add new requests to,797.37,3207.17,97.19,33,0.933,0.0,,Q4_K_M
+8,Inference latency is affected by both the prefill phase and,798.69,4081.79,83.3,49,0.977,0.0,,Q4_K_M
+8,The attention mechanism computes a weighted sum of values based on,798.95,3251.71,98.54,33,0.966,0.0,,Q4_K_M
+8,Memory efficiency in large language models is critical because,797.07,5064.62,153.47,33,0.806,0.0,,Q4_K_M
+8,The NUMA architecture affects memory access latency because,795.79,3299.28,99.98,33,0.933,0.0,,Q4_K_M
+8,The transformer architecture was introduced in 2017 and has since,610.67,5102.0,104.12,49,0.932,0.0,,Q4_K_M
+8,Continuous batching allows the server to add new requests to,796.9,4687.49,95.66,49,0.933,0.0,,Q4_K_M
+8,Speculative decoding works by using a smaller draft model to,796.96,5407.81,110.36,49,0.909,0.0,,Q4_K_M
+8,Photosynthesis is the process by which plants convert light energy into,611.58,5311.2,81.71,65,0.931,0.0,,Q4_K_M
+8,"The Battle of Waterloo was fought on 18 June 1815, marking",625.34,7100.74,144.91,49,0.864,0.0,,Q4_K_M
+8,"When a user types in an AI-assisted editor, the system must",610.93,4299.89,130.3,33,0.867,0.0,,Q4_K_M
+8,Reinforcement learning is a type of machine learning in which,800.09,5355.68,109.3,49,0.911,0.0,,Q4_K_M
+8,The time-to-first-token metric measures how long it takes before,611.56,5111.66,104.32,49,0.911,0.0,,Q4_K_M

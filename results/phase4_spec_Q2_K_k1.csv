@@ -1,0 +1,21 @@
+k,prompt,ttft_ms,e2e_ms,tpot_ms,tokens,acceptance_rate,speedup_ratio,error,draft_model
+1,The French Revolution began in 1789 and fundamentally changed,488.53,10198.18,212.46,48,0.917,0.0,,Q2_K
+1,Distributed training splits computation across multiple devices to,349.41,13688.91,213.89,64,0.562,0.0,,Q2_K
+1,"Thread affinity pins threads to specific CPU cores, which",486.14,6640.06,207.5,32,0.875,0.0,,Q2_K
+1,"The Battle of Waterloo was fought on 18 June 1815, marking",377.22,14109.26,220.46,64,0.906,0.0,,Q2_K
+1,Neural networks consist of layers of interconnected nodes that,349.97,6560.41,205.01,32,0.688,0.0,,Q2_K
+1,"The internet protocol suite, commonly known as TCP/IP,",354.5,6596.26,206.13,32,0.688,0.0,,Q2_K
+1,Speculative decoding works by using a smaller draft model to,347.95,13827.71,216.06,64,0.75,0.0,,Q2_K
+1,Continuous batching allows the server to add new requests to,348.8,6583.24,205.73,32,0.75,0.0,,Q2_K
+1,Inference latency is affected by both the prefill phase and,486.83,10166.54,211.8,48,1.0,0.0,,Q2_K
+1,The attention mechanism computes a weighted sum of values based on,488.73,6647.24,207.73,32,0.938,0.0,,Q2_K
+1,Memory efficiency in large language models is critical because,344.89,6488.54,202.77,32,0.812,0.0,,Q2_K
+1,The NUMA architecture affects memory access latency because,347.6,6561.4,205.04,32,0.812,0.0,,Q2_K
+1,The transformer architecture was introduced in 2017 and has since,489.78,10145.06,211.36,48,0.667,0.0,,Q2_K
+1,Continuous batching allows the server to add new requests to,348.01,10080.32,210.01,48,0.792,0.0,,Q2_K
+1,Speculative decoding works by using a smaller draft model to,348.54,10076.2,209.92,48,0.875,0.0,,Q2_K
+1,Photosynthesis is the process by which plants convert light energy into,490.71,13957.21,218.08,64,0.812,0.0,,Q2_K
+1,"The Battle of Waterloo was fought on 18 June 1815, marking",376.32,10086.35,210.13,48,0.917,0.0,,Q2_K
+1,"When a user types in an AI-assisted editor, the system must",490.66,6584.86,205.78,32,0.812,0.0,,Q2_K
+1,Reinforcement learning is a type of machine learning in which,485.83,10163.1,211.73,48,0.833,0.0,,Q2_K
+1,The time-to-first-token metric measures how long it takes before,490.04,10146.54,211.39,48,0.75,0.0,,Q2_K
