@@ -73,6 +73,7 @@ class PrefillManager:
         chars_per_token: int = 4,   # rough chars-per-token for prefix matching
     ):
         self.llm = llm
+        self._llm_lock = Lock()
         self.n_tokens = n_tokens
         self.idle_ms = idle_ms
         self.enabled = enabled
@@ -141,7 +142,7 @@ class PrefillManager:
 
             # Check if the prompt starts with the warm prefix
             warm_prefix = state.prefilled_context[-self._window:]
-            hit = prompt[-self._window:].startswith(warm_prefix[:min(len(warm_prefix), 64)])
+            hit = prompt.endswith(warm_prefix) or warm_prefix in prompt[-self._window:]
 
             if hit:
                 self.total_hits += 1
@@ -189,6 +190,11 @@ class PrefillManager:
     # ------------------------------------------------------------------
     # Internal
     # ------------------------------------------------------------------
+# In prefill_manager.py — don't reset in _run_llm_safe
+    def _run_llm_safe(self, prompt: str, **kwargs):
+        with self._llm_lock:
+            # NO reset here — preserve KV cache state from prefill
+            return self.llm(prompt, **kwargs)
 
     async def _do_prefill(self, session_id: str) -> None:
         """
@@ -214,7 +220,7 @@ class PrefillManager:
             loop = asyncio.get_event_loop()
             await loop.run_in_executor(
                 None,
-                lambda: self.llm(tail, max_tokens=1, temperature=0.0, echo=False),
+                lambda: self._run_llm_safe(tail),
             )
             elapsed_ms = (time.perf_counter() - start) * 1000
 

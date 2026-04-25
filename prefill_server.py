@@ -162,15 +162,23 @@ async def _stream_tokens_prefill(
     token_count = 0
     mem_before = get_memory_stats()
 
-    for chunk in llm(
+    prefill_manager._cancel_timer(session_id)
+
+with prefill_manager._llm_lock:
+    # NO llm.reset() — let llama.cpp reuse the prefilled KV state
+    result = llm(
         prompt,
         max_tokens=max_tokens,
         temperature=temperature,
-        stream=True,
+        stream=False,
         echo=False,
-    ):
-        token_text = chunk["choices"][0]["text"]
-        if not token_text:
+    )
+
+    # result is a single dict when stream=False
+    full_text = result["choices"][0]["text"]
+    for token_text in full_text.split(" "):
+        token_text = token_text + " "
+        if not token_text.strip():
             continue
         now = time.perf_counter()
         if first_token:
