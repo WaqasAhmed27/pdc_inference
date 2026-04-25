@@ -123,6 +123,10 @@ draft_llm        = None   # draft model (TinyLlama 1.1B)
 spec_engine      = None
 eviction_policy: Optional[EvictionPolicy] = None
 prefill_manager: Optional[PrefillManager] = None
+spec_disabled_reason: str = ""
+spec_active: bool = False
+tokenizer_compatible: bool = False
+active_draft_model_path: str = ""
 
 # Cumulative speculative decoding stats
 _spec_stats = {
@@ -138,6 +142,7 @@ _spec_stats = {
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global llm, draft_llm, spec_engine, eviction_policy, prefill_manager
+    global spec_disabled_reason, spec_active, tokenizer_compatible, active_draft_model_path
     from llama_cpp import Llama
 
     log.info(f"Loading target model: {MODEL_PATH}")
@@ -152,19 +157,67 @@ async def lifespan(app: FastAPI):
     )
 
     if SPEC_ENABLED:
-        log.info(f"Loading draft model (k={SPEC_K}): {DRAFT_MODEL_PATH}")
+        fallback_mistral_draft = "models/mistral-7b-instruct-v0.2.Q4_K_M.gguf"
+        target_is_mistral = "mistral" in os.path.basename(MODEL_PATH).lower()
+        requested_draft = DRAFT_MODEL_PATH.strip() if DRAFT_MODEL_PATH else ""
+
+        candidates = []
+        if requested_draft:
+            candidates.append(requested_draft)
+        if target_is_mistral and fallback_mistral_draft not in candidates:
+            candidates.append(fallback_mistral_draft)
+
         from speculative_engine import SpeculativeEngine
-        spec_engine = SpeculativeEngine(
-            draft_model_path=DRAFT_MODEL_PATH,
-            target_model_path=MODEL_PATH,
-            k=SPEC_K,
-            n_gpu_layers=N_GPU_LAYERS,
-            n_ctx=N_CTX,
-            baseline_tpot_ms=SPEC_BASELINE_TPOT_MS,
-            verbose=False,
-        )
-        log.info("Speculative engine ready.")
+
+        spec_engine = None
+        spec_active = False
+        tokenizer_compatible = False
+        active_draft_model_path = requested_draft
+        spec_disabled_reason = "no compatible draft model found"
+
+        if not candidates:
+            spec_disabled_reason = "no draft model configured"
+            log.error("Speculative mode: DISABLED (reason: %s)", spec_disabled_reason)
+        else:
+            for candidate in candidates:
+                if not os.path.exists(candidate):
+                    log.warning("Draft model candidate missing: %s", candidate)
+                    continue
+                try:
+                    log.info(f"Loading draft model (k={SPEC_K}): {candidate}")
+                    spec_engine = SpeculativeEngine(
+                        draft_model_path=candidate,
+                        target_model_path=MODEL_PATH,
+                        k=SPEC_K,
+                        n_gpu_layers=N_GPU_LAYERS,
+                        n_ctx=N_CTX,
+                        baseline_tpot_ms=SPEC_BASELINE_TPOT_MS,
+                        verbose=False,
+                    )
+                    spec_active = True
+                    tokenizer_compatible = True
+                    active_draft_model_path = candidate
+                    spec_disabled_reason = ""
+                    log.info("Speculative mode: ACTIVE (compatible models)")
+                    break
+                except Exception as e:
+                    log.warning(
+                        "Draft model incompatible or failed (%s): %s",
+                        candidate,
+                        e,
+                    )
+
+            if not spec_active:
+                spec_engine = None
+                tokenizer_compatible = False
+                active_draft_model_path = requested_draft or ""
+                spec_disabled_reason = "no compatible draft model found"
+                log.error("Speculative mode: DISABLED (reason: %s)", spec_disabled_reason)
     else:
+        spec_active = False
+        tokenizer_compatible = False
+        active_draft_model_path = ""
+        spec_disabled_reason = "speculative decoding disabled by config"
         log.info("Speculative decoding disabled.")
 
     log.info(f"Eviction policy: {EVICTION_POLICY.upper()}  max_ctx={EVICTION_MAX_CTX}")
@@ -335,6 +388,11 @@ async def spec_stats():
     avg_speedup = (SPEC_BASELINE_TPOT_MS / avg_tpot_ms) if (SPEC_BASELINE_TPOT_MS > 0 and avg_tpot_ms > 0) else 0.0
     return {
         "spec_enabled":    SPEC_ENABLED,
+        "spec_active":     spec_active,
+        "spec_disabled_reason": spec_disabled_reason,
+        "target_model": MODEL_PATH,
+        "draft_model": active_draft_model_path or DRAFT_MODEL_PATH,
+        "tokenizer_compatible": tokenizer_compatible,
         "k":               SPEC_K,
         "eviction_policy": EVICTION_POLICY,
         **_spec_stats,
@@ -359,6 +417,11 @@ async def health():
         "status":          "ok",
         "model_loaded":    llm is not None,
         "spec_enabled":    SPEC_ENABLED,
+        "spec_active":     spec_active,
+        "spec_disabled_reason": spec_disabled_reason,
+        "target_model": MODEL_PATH,
+        "draft_model": active_draft_model_path or DRAFT_MODEL_PATH,
+        "tokenizer_compatible": tokenizer_compatible,
         "spec_k":          SPEC_K,
         "eviction_policy": EVICTION_POLICY,
         "prefill_enabled": PREFILL_ENABLED,

@@ -72,7 +72,9 @@ class SpeculativeEngine:
         if list(self.draft.tokenize(probe)) != list(self.target.tokenize(probe)):
             raise ValueError(
                 "Draft/target tokenizers are not compatible. "
-                "Speculative engine requires identical token ids across both models."
+                "Speculative decoding here requires identical token ids across models. "
+                "Use a draft model from the same tokenizer family as the target "
+                "(e.g., a quantized/smaller Mistral-family draft for Mistral target)."
             )
 
         log.info("Speculative engine ready.")
