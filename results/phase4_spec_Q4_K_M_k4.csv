@@ -1,21 +1,21 @@
 k,prompt,ttft_ms,e2e_ms,tpot_ms,tokens,acceptance_rate,speedup_ratio,error,draft_model
-4,The French Revolution began in 1789 and fundamentally changed,722.79,7066.82,144.22,49,0.925,0.0,,Q4_K_M
-4,Distributed training splits computation across multiple devices to,722.44,8600.04,132.31,65,0.981,0.0,,Q4_K_M
-4,"Thread affinity pins threads to specific CPU cores, which",719.79,4572.77,138.57,33,0.885,0.0,,Q4_K_M
-4,"The Battle of Waterloo was fought on 18 June 1815, marking",544.77,10264.21,157.91,65,0.873,0.0,,Q4_K_M
-4,Neural networks consist of layers of interconnected nodes that,721.17,4788.98,145.12,33,0.857,0.0,,Q4_K_M
-4,"The internet protocol suite, commonly known as TCP/IP,",726.89,4263.26,129.19,33,0.926,0.0,,Q4_K_M
-4,Speculative decoding works by using a smaller draft model to,718.33,9848.89,153.89,64,0.83,0.0,,Q4_K_M
-4,Continuous batching allows the server to add new requests to,718.38,4753.14,144.03,33,0.846,0.0,,Q4_K_M
-4,Inference latency is affected by both the prefill phase and,720.11,6481.79,132.28,49,0.925,0.0,,Q4_K_M
-4,The attention mechanism computes a weighted sum of values based on,720.14,4750.3,143.95,33,0.962,0.0,,Q4_K_M
-4,Memory efficiency in large language models is critical because,520.21,6298.04,190.85,33,0.786,0.0,,Q4_K_M
-4,The NUMA architecture affects memory access latency because,716.91,4231.04,132.22,32,0.846,0.0,,Q4_K_M
-4,The transformer architecture was introduced in 2017 and has since,724.33,7100.69,144.91,49,0.85,0.0,,Q4_K_M
-4,Continuous batching allows the server to add new requests to,719.16,6624.85,138.02,48,0.872,0.0,,Q4_K_M
-4,Speculative decoding works by using a smaller draft model to,718.38,7314.74,149.28,49,0.9,0.0,,Q4_K_M
-4,Photosynthesis is the process by which plants convert light energy into,725.71,9829.15,151.22,65,0.889,0.0,,Q4_K_M
-4,"The Battle of Waterloo was fought on 18 June 1815, marking",546.18,7669.49,156.52,49,0.854,0.0,,Q4_K_M
-4,"When a user types in an AI-assisted editor, the system must",724.4,5722.47,173.41,33,0.821,0.0,,Q4_K_M
-4,Reinforcement learning is a type of machine learning in which,720.0,7092.24,144.74,49,0.9,0.0,,Q4_K_M
-4,The time-to-first-token metric measures how long it takes before,724.14,6549.14,133.66,49,0.974,0.0,,Q4_K_M
+4,The French Revolution began in 1789 and fundamentally changed,722.39,6468.28,132.01,49,0.949,0.226,,Q4_K_M
+4,Distributed training splits computation across multiple devices to,721.41,9858.36,151.67,65,0.906,0.197,,Q4_K_M
+4,"Thread affinity pins threads to specific CPU cores, which",722.13,5361.35,167.54,32,0.852,0.178,,Q4_K_M
+4,"The Battle of Waterloo was fought on 18 June 1815, marking",545.7,9691.74,149.1,65,0.907,0.2,,Q4_K_M
+4,Neural networks consist of layers of interconnected nodes that,720.71,4770.42,144.56,33,0.857,0.206,,Q4_K_M
+4,"The internet protocol suite, commonly known as TCP/IP,",726.21,4793.58,145.26,33,0.926,0.205,,Q4_K_M
+4,Speculative decoding works by using a smaller draft model to,718.74,9743.59,149.9,65,0.906,0.199,,Q4_K_M
+4,Continuous batching allows the server to add new requests to,718.26,4761.97,144.3,33,0.962,0.207,,Q4_K_M
+4,Inference latency is affected by both the prefill phase and,720.48,6478.96,132.22,49,0.95,0.226,,Q4_K_M
+4,The attention mechanism computes a weighted sum of values based on,719.86,4747.58,143.87,33,0.962,0.207,,Q4_K_M
+4,Memory efficiency in large language models is critical because,518.85,4709.13,142.7,33,0.889,0.209,,Q4_K_M
+4,The NUMA architecture affects memory access latency because,716.62,4230.39,132.2,32,0.846,0.226,,Q4_K_M
+4,The transformer architecture was introduced in 2017 and has since,724.09,7095.17,144.8,49,0.875,0.206,,Q4_K_M
+4,Continuous batching allows the server to add new requests to,719.33,7795.74,159.1,49,0.875,0.188,,Q4_K_M
+4,Speculative decoding works by using a smaller draft model to,718.33,6653.94,135.79,49,0.95,0.22,,Q4_K_M
+4,Photosynthesis is the process by which plants convert light energy into,725.56,10446.01,160.71,65,0.889,0.186,,Q4_K_M
+4,"The Battle of Waterloo was fought on 18 June 1815, marking",544.95,6428.72,131.2,49,0.95,0.228,,Q4_K_M
+4,"When a user types in an AI-assisted editor, the system must",723.95,4638.39,144.95,32,0.885,0.206,,Q4_K_M
+4,Reinforcement learning is a type of machine learning in which,720.02,6489.25,132.43,49,0.925,0.225,,Q4_K_M
+4,The time-to-first-token metric measures how long it takes before,724.41,6542.12,133.51,49,0.974,0.224,,Q4_K_M

@@ -1,21 +1,21 @@
 k,prompt,ttft_ms,e2e_ms,tpot_ms,tokens,acceptance_rate,speedup_ratio,error,draft_model
-4,The French Revolution began in 1789 and fundamentally changed,540.13,5172.13,105.55,49,0.9,0.0,,Q2_K
-4,Distributed training splits computation across multiple devices to,536.88,9170.76,141.09,65,0.818,0.0,,Q2_K
-4,"Thread affinity pins threads to specific CPU cores, which",536.57,4157.93,126.0,33,0.815,0.0,,Q2_K
-4,"The Battle of Waterloo was fought on 18 June 1815, marking",455.49,8234.83,126.69,65,0.889,0.0,,Q2_K
-4,Neural networks consist of layers of interconnected nodes that,539.77,5488.92,166.33,33,0.724,0.0,,Q2_K
-4,"The internet protocol suite, commonly known as TCP/IP,",540.07,3684.82,111.66,33,0.926,0.0,,Q2_K
-4,Speculative decoding works by using a smaller draft model to,533.62,9671.35,148.79,65,0.709,0.0,,Q2_K
-4,Continuous batching allows the server to add new requests to,532.13,4624.36,140.13,33,0.759,0.0,,Q2_K
-4,Inference latency is affected by both the prefill phase and,537.74,4678.28,95.48,49,0.923,0.0,,Q2_K
-4,The attention mechanism computes a weighted sum of values based on,536.46,3686.88,111.72,33,0.889,0.0,,Q2_K
-4,Memory efficiency in large language models is critical because,395.43,5010.28,151.83,33,0.786,0.0,,Q2_K
-4,The NUMA architecture affects memory access latency because,531.04,4098.75,124.2,33,0.852,0.0,,Q2_K
-4,The transformer architecture was introduced in 2017 and has since,541.06,6903.27,140.88,49,0.786,0.0,,Q2_K
-4,Continuous batching allows the server to add new requests to,532.86,5723.19,116.8,49,0.902,0.0,,Q2_K
-4,Speculative decoding works by using a smaller draft model to,533.1,7028.3,143.43,49,0.762,0.0,,Q2_K
-4,Photosynthesis is the process by which plants convert light energy into,540.91,7662.75,119.73,64,0.868,0.0,,Q2_K
-4,"The Battle of Waterloo was fought on 18 June 1815, marking",428.92,6099.79,124.49,49,0.854,0.0,,Q2_K
-4,"When a user types in an AI-assisted editor, the system must",541.27,4183.74,126.78,33,0.786,0.0,,Q2_K
-4,Reinforcement learning is a type of machine learning in which,539.06,6133.57,127.78,48,0.875,0.0,,Q2_K
-4,The time-to-first-token metric measures how long it takes before,541.74,7381.92,150.65,49,0.714,0.0,,Q2_K
+4,The French Revolution began in 1789 and fundamentally changed,538.92,5142.63,104.95,49,0.925,0.284,,Q2_K
+4,Distributed training splits computation across multiple devices to,539.57,8682.19,133.57,65,0.868,0.223,,Q2_K
+4,"Thread affinity pins threads to specific CPU cores, which",536.67,4139.43,125.44,33,0.815,0.238,,Q2_K
+4,"The Battle of Waterloo was fought on 18 June 1815, marking",428.39,8634.59,132.84,65,0.87,0.225,,Q2_K
+4,Neural networks consist of layers of interconnected nodes that,537.8,5076.28,153.83,33,0.786,0.194,,Q2_K
+4,"The internet protocol suite, commonly known as TCP/IP,",541.36,3667.13,111.13,33,0.926,0.269,,Q2_K
+4,Speculative decoding works by using a smaller draft model to,533.95,13421.81,206.49,65,0.586,0.145,,Q2_K
+4,Continuous batching allows the server to add new requests to,532.48,4716.05,142.91,33,0.786,0.209,,Q2_K
+4,Inference latency is affected by both the prefill phase and,537.94,4652.39,94.95,49,0.923,0.314,,Q2_K
+4,The attention mechanism computes a weighted sum of values based on,536.3,3670.58,111.23,33,0.889,0.268,,Q2_K
+4,Memory efficiency in large language models is critical because,396.38,4874.05,147.7,33,0.786,0.202,,Q2_K
+4,The NUMA architecture affects memory access latency because,530.93,4122.94,124.94,33,0.852,0.239,,Q2_K
+4,The transformer architecture was introduced in 2017 and has since,541.37,5998.85,122.43,49,0.854,0.244,,Q2_K
+4,Continuous batching allows the server to add new requests to,532.61,6559.45,133.87,49,0.81,0.223,,Q2_K
+4,Speculative decoding works by using a smaller draft model to,533.59,8317.8,169.75,49,0.667,0.176,,Q2_K
+4,Photosynthesis is the process by which plants convert light energy into,541.02,7650.77,119.54,64,0.889,0.25,,Q2_K
+4,"The Battle of Waterloo was fought on 18 June 1815, marking",426.31,6031.94,123.1,49,0.875,0.242,,Q2_K
+4,"When a user types in an AI-assisted editor, the system must",542.81,4952.5,150.08,33,0.75,0.199,,Q2_K
+4,Reinforcement learning is a type of machine learning in which,536.52,6068.05,126.42,48,0.875,0.236,,Q2_K
+4,The time-to-first-token metric measures how long it takes before,541.15,7321.94,149.43,49,0.698,0.2,,Q2_K

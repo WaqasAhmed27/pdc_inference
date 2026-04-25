@@ -5,16 +5,16 @@
   Metric                         Cold (no prefill)   Warm (prefill)
   --------------------------------------------------------------
   Requests (ok)                                30               30
-  TTFT mean (ms)                            928.6            754.0
-  TTFT p50  (ms)                            870.8            720.6
-  TTFT p95  (ms)                           1681.5            914.1
-  TTFT min  (ms)                            842.5            668.7
-  E2E  p50  (ms)                           2292.6           2123.2
+  TTFT mean (ms)                            920.8            746.0
+  TTFT p50  (ms)                            869.5            716.5
+  TTFT p95  (ms)                           1683.7            758.9
+  TTFT min  (ms)                            849.4            675.3
+  E2E  p50  (ms)                           2272.7           2126.7
   Cache hit rate                                —            3.3%
   --------------------------------------------------------------
-  TTFT mean reduction                       18.8%
-  TTFT p50  reduction                       17.3%
-  TTFT p95  reduction                       45.6%
+  TTFT mean reduction                       19.0%
+  TTFT p50  reduction                       17.6%
+  TTFT p95  reduction                       54.9%
 
   Target compliance (TTFT < 200ms)
     Cold: 0/30 (0%)
