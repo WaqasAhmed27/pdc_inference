@@ -73,7 +73,7 @@ async def send_spec_request(
 ) -> SpecExpResult:
     result = SpecExpResult(k=k, prompt=prompt[:120])
     try:
-        payload = {"prompt": prompt, "max_tokens": max_tokens, "temperature": 0.0}
+        payload = {"prompt": prompt, "max_tokens": max_tokens, "temperature": 0.3}
         async with session.post(
             f"{HOST}/complete_spec", json=payload,
             timeout=aiohttp.ClientTimeout(total=120),

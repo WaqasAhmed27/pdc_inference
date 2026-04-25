@@ -62,12 +62,13 @@ log = logging.getLogger(__name__)
 # Config
 # ---------------------------------------------------------------------------
 MODEL_PATH       = os.environ.get("MODEL_PATH",       "models/mistral-7b-instruct-v0.2.Q8_0.gguf")
-DRAFT_MODEL_PATH = os.environ.get("DRAFT_MODEL_PATH", "models/mistral-7b-instruct-v0.2.Q4_K_M.gguf")
+DRAFT_MODEL_PATH = os.environ.get("DRAFT_MODEL_PATH", "models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf")
 N_GPU_LAYERS     = int(os.environ.get("N_GPU_LAYERS",     "-1"))
 N_CTX            = int(os.environ.get("N_CTX",            "2048"))
 N_THREADS        = int(os.environ.get("N_THREADS",        "4"))
 SPEC_ENABLED     = os.environ.get("SPEC_ENABLED",     "1") == "1"
 SPEC_K           = int(os.environ.get("SPEC_K",           "4"))
+SPEC_BASELINE_TPOT_MS = float(os.environ.get("SPEC_BASELINE_TPOT_MS", "0"))
 EVICTION_POLICY  = os.environ.get("EVICTION_POLICY",  "lru")     # "lru" | "adaptive"
 EVICTION_MAX_CTX = int(os.environ.get("EVICTION_MAX_CTX", "1024"))
 PREFILL_ENABLED  = os.environ.get("PREFILL_ENABLED",  "1") == "1"
@@ -82,14 +83,14 @@ class SpecRequest(BaseModel):
     session_id: str = "default"
     prompt: str
     max_tokens: int = 64
-    temperature: float = 0.0
+    temperature: float = 0.3
 
 class SpecRewriteRequest(BaseModel):
     session_id: str = "default"
     text: str
     instruction: str = "Improve clarity and conciseness."
     max_tokens: int = 128
-    temperature: float = 0.0
+    temperature: float = 0.3
 
 class ContextUpdate(BaseModel):
     session_id: str
@@ -131,6 +132,7 @@ _spec_stats = {
     "total_requests":   0,
     "total_target_calls": 0,
     "total_draft_calls":  0,
+    "total_e2e_ms": 0.0,
 }
 
 @asynccontextmanager
@@ -158,6 +160,7 @@ async def lifespan(app: FastAPI):
             k=SPEC_K,
             n_gpu_layers=N_GPU_LAYERS,
             n_ctx=N_CTX,
+            baseline_tpot_ms=SPEC_BASELINE_TPOT_MS,
             verbose=False,
         )
         log.info("Speculative engine ready.")
@@ -236,9 +239,12 @@ async def complete_spec(req: SpecRequest):
                 "e2e_ms":          round(result.e2e_ms, 2),
                 "tpot_ms":         round(result.tpot_ms, 2),
                 "tokens":          result.tokens_generated,
+                "target_calls":    result.target_calls,
+                "draft_calls":     result.draft_calls,
                 "acceptance_rate": round(result.acceptance_rate, 3),
                 "speedup_ratio":   round(result.speedup_ratio, 3),
                 "spec_k":          SPEC_K,
+                "baseline_tpot_ms": SPEC_BASELINE_TPOT_MS,
                 "eviction_policy": EVICTION_POLICY,
                 "mem":             get_memory_stats(),
             }
@@ -290,6 +296,11 @@ async def rewrite_spec(req: SpecRewriteRequest):
             "e2e_ms":          round(result.e2e_ms, 2),
             "acceptance_rate": round(result.acceptance_rate, 3),
             "speedup_ratio":   round(result.speedup_ratio, 3),
+            "tokens":          result.tokens_generated,
+            "target_calls":    result.target_calls,
+            "draft_calls":     result.draft_calls,
+            "tpot_ms":         round(result.tpot_ms, 2),
+            "baseline_tpot_ms": SPEC_BASELINE_TPOT_MS,
             "eviction_policy": EVICTION_POLICY,
         }
     else:
@@ -320,15 +331,16 @@ async def update_context(req: ContextUpdate):
 @app.get("/spec/stats", summary="Speculative decoding global stats")
 async def spec_stats():
     total = _spec_stats["total_accepted"] + _spec_stats["total_rejected"]
+    avg_tpot_ms = _spec_stats["total_e2e_ms"] / max(_spec_stats["total_generated"], 1)
+    avg_speedup = (SPEC_BASELINE_TPOT_MS / avg_tpot_ms) if (SPEC_BASELINE_TPOT_MS > 0 and avg_tpot_ms > 0) else 0.0
     return {
         "spec_enabled":    SPEC_ENABLED,
         "k":               SPEC_K,
         "eviction_policy": EVICTION_POLICY,
         **_spec_stats,
         "overall_acceptance_rate": round(_spec_stats["total_accepted"] / max(total, 1), 3),
-        "avg_speedup_ratio": round(
-            _spec_stats["total_generated"] / max(_spec_stats["total_target_calls"], 1), 3
-        ),
+        "avg_tpot_ms": round(avg_tpot_ms, 3),
+        "avg_speedup_ratio": round(avg_speedup, 3),
         "eviction_stats":  eviction_policy.stats if eviction_policy else {},
         "memory":          get_memory_stats(),
     }
@@ -365,3 +377,4 @@ def _update_spec_stats(result):
     _spec_stats["total_requests"]     += 1
     _spec_stats["total_target_calls"] += result.target_calls
     _spec_stats["total_draft_calls"]  += result.draft_calls
+    _spec_stats["total_e2e_ms"]       += result.e2e_ms

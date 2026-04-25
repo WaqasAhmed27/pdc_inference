@@ -8,6 +8,8 @@ import time
 from dataclasses import dataclass
 from typing import List, Optional
 
+import numpy as np
+
 log = logging.getLogger(__name__)
 
 
@@ -23,18 +25,12 @@ class SpecResult:
     tpot_ms: float = 0.0
     draft_calls: int = 0
     target_calls: int = 0
+    speedup_ratio: float = 0.0
     error: str = ""
 
     @property
     def ok(self) -> bool:
         return not self.error
-
-    @property
-    def speedup_ratio(self) -> float:
-        if self.target_calls == 0:
-            return 0.0
-        return self.tokens_generated / self.target_calls
-
 
 class SpeculativeEngine:
     def __init__(
@@ -44,13 +40,15 @@ class SpeculativeEngine:
         k: int = 4,
         n_gpu_layers: int = -1,
         n_ctx: int = 2048,
-        temperature: float = 0.2,
+        temperature: float = 0.3,
+        baseline_tpot_ms: float = 0.0,
         verbose: bool = False,
     ):
         from llama_cpp import Llama
 
         self.k = k
-        self.temperature = temperature
+        self.temperature = float(temperature)
+        self.baseline_tpot_ms = float(baseline_tpot_ms)
 
         log.info(f"Loading draft model (k={k}): {draft_model_path}")
         self.draft = Llama(
@@ -85,7 +83,7 @@ class SpeculativeEngine:
         max_tokens: int = 64,
         temperature: Optional[float] = None,
     ) -> SpecResult:
-        _ = temperature if temperature is not None else self.temperature
+        draft_temp = float(temperature if temperature is not None else self.temperature)
         result = SpecResult()
         t_start = time.perf_counter()
         first_token_time: Optional[float] = None
@@ -99,12 +97,12 @@ class SpeculativeEngine:
                 remaining = max_tokens - len(generated_tokens)
                 block_k = min(self.k, remaining)
 
-                draft_tokens = self._draft_sample(context_tokens, block_k)
+                draft_tokens = self._draft_sample(context_tokens, block_k, draft_temp)
                 result.draft_calls += 1
                 if not draft_tokens:
                     break
 
-                target_tokens = self._target_predict(context_tokens, len(draft_tokens) + 1)
+                target_tokens = self._target_predict(context_tokens, draft_tokens)
                 result.target_calls += 1
                 if not target_tokens:
                     break
@@ -151,12 +149,12 @@ class SpeculativeEngine:
         self._finalise(result, t_start, first_token_time)
         return result
 
-    def _draft_sample(self, context: List[int], k: int) -> List[int]:
+    def _draft_sample(self, context: List[int], k: int, temperature: float) -> List[int]:
         tokens: List[int] = []
         gen = self.draft.generate(
             context,
             reset=True,
-            temp=0.0,
+            temp=max(0.0, temperature),
             top_p=1.0,
             min_p=0.0,
         )
@@ -170,24 +168,33 @@ class SpeculativeEngine:
                 break
         return tokens
 
-    def _target_predict(self, context: List[int], n_tokens: int) -> List[int]:
-        tokens: List[int] = []
-        gen = self.target.generate(
-            context,
-            reset=True,
-            temp=0.0,
-            top_p=1.0,
-            min_p=0.0,
-        )
-        for _ in range(n_tokens):
-            try:
-                tok = int(next(gen))
-            except StopIteration:
-                break
-            tokens.append(tok)
+    def _target_predict(self, context: List[int], draft_tokens: List[int]) -> List[int]:
+        """
+        Verify a draft block with a single target forward pass over:
+            context + draft_block
+        Then read argmax predictions for each position from logits.
+        """
+        n_tokens = len(draft_tokens) + 1
+        if n_tokens <= 0 or not context:
+            return []
+
+        full = list(context) + list(draft_tokens)
+
+        self.target.reset()
+        self.target.eval(full)
+        scores = self.target.scores  # shape: [len(full), vocab]
+        if scores is None or len(scores) == 0:
+            return []
+
+        preds: List[int] = []
+        start_row = len(context) - 1
+        end_row = min(start_row + n_tokens, len(scores))
+        for row in range(start_row, end_row):
+            tok = int(np.argmax(scores[row]))
+            preds.append(tok)
             if tok == self.target.token_eos():
                 break
-        return tokens
+        return preds
 
     def _decode(self, token_ids: List[int]) -> str:
         if not token_ids:
@@ -202,7 +209,9 @@ class SpeculativeEngine:
         if first_token_time is None:
             result.ttft_ms = result.e2e_ms
         n = result.tokens_generated
-        if n > 1 and result.ttft_ms > 0:
-            result.tpot_ms = (result.e2e_ms - result.ttft_ms) / (n - 1)
+        if n > 0:
+            result.tpot_ms = result.e2e_ms / n
+        if self.baseline_tpot_ms > 0 and result.tpot_ms > 0:
+            result.speedup_ratio = self.baseline_tpot_ms / result.tpot_ms
         total = result.tokens_accepted + result.tokens_rejected
         result.acceptance_rate = result.tokens_accepted / total if total > 0 else 0.0
