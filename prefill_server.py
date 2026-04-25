@@ -29,7 +29,7 @@ import psutil
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from prefill_manager import PrefillManager
 
@@ -58,6 +58,18 @@ N_THREADS       = int(os.environ.get("N_THREADS",       "4"))
 PREFILL_ENABLED = os.environ.get("PREFILL_ENABLED", "1") == "1"
 PREFILL_TOKENS  = int(os.environ.get("PREFILL_TOKENS",  "32"))
 PREFILL_IDLE_MS = float(os.environ.get("PREFILL_IDLE_MS", "150"))
+
+
+def build_complete_prompt(text: str) -> str:
+    return f"[INST] Continue this text naturally without repeating it:\n{text} [/INST]"
+
+
+def build_rewrite_prompt(text: str, instruction: str) -> str:
+    return (
+        f"[INST] {instruction}\n\n"
+        f"Original text:\n{text}\n\n"
+        f"Rewritten text: [/INST]"
+    )
 
 # ---------------------------------------------------------------------------
 # Pydantic models
@@ -154,30 +166,29 @@ async def _stream_tokens_prefill(
     temperature: float,
     endpoint: str,
 ):
-    cache_hit, prefill_overhead_ms = prefill_manager.maybe_prefill(session_id, prompt)
-
     request_start = time.perf_counter()
     first_token = True
     ttft_ms = 0.0
     token_count = 0
     mem_before = get_memory_stats()
-
-    for chunk in llm(
-        prompt,
-        max_tokens=max_tokens,
-        temperature=temperature,
-        stream=True,
-        echo=False,
-    ):
-        token_text = chunk["choices"][0]["text"]
-        if not token_text:
-            continue
-        now = time.perf_counter()
-        if first_token:
-            ttft_ms = (now - request_start) * 1000
-            first_token = False
-        token_count += 1
-        yield f"data: {token_text}\n\n"
+    with prefill_manager.model_lock():
+        cache_hit, prefill_overhead_ms = prefill_manager.maybe_prefill_locked(session_id, prompt)
+        for chunk in llm(
+            prompt,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            stream=True,
+            echo=False,
+        ):
+            token_text = chunk["choices"][0]["text"]
+            if not token_text:
+                continue
+            now = time.perf_counter()
+            if first_token:
+                ttft_ms = (now - request_start) * 1000
+                first_token = False
+            token_count += 1
+            yield f"data: {token_text}\n\n"
 
     e2e_ms  = (time.perf_counter() - request_start) * 1000
     tpot_ms = (e2e_ms - ttft_ms) / max(token_count - 1, 1) if token_count > 1 else 0.0
@@ -220,7 +231,9 @@ async def update_context(req: ContextUpdate):
     """
     if prefill_manager is None:
         raise HTTPException(503, "Server not ready")
-    prefill_manager.update_context(req.session_id, req.text)
+    # Use the same canonical prompt shape here and in /complete_prefill.
+    # Prefill reuse requires token-prefix identity, not suffix string similarity.
+    prefill_manager.update_context(req.session_id, build_complete_prompt(req.text))
     return {"status": "ok", "prefill_enabled": PREFILL_ENABLED}
 
 
@@ -228,7 +241,7 @@ async def update_context(req: ContextUpdate):
 async def complete_prefill(req: PrefillCompleteRequest):
     if llm is None:
         raise HTTPException(503, "Model not loaded")
-    prompt = f"[INST] Continue this text naturally without repeating it:\n{req.prompt} [/INST]"
+    prompt = build_complete_prompt(req.prompt)
     return StreamingResponse(
         _stream_tokens_prefill(req.session_id, prompt, req.max_tokens, req.temperature, "complete"),
         media_type="text/event-stream",
@@ -240,11 +253,7 @@ async def complete_prefill(req: PrefillCompleteRequest):
 async def rewrite_prefill(req: PrefillRewriteRequest):
     if llm is None:
         raise HTTPException(503, "Model not loaded")
-    prompt = (
-        f"[INST] {req.instruction}\n\n"
-        f"Original text:\n{req.text}\n\n"
-        f"Rewritten text: [/INST]"
-    )
+    prompt = build_rewrite_prompt(req.text, req.instruction)
     return StreamingResponse(
         _stream_tokens_prefill(req.session_id, prompt, req.max_tokens, req.temperature, "rewrite"),
         media_type="text/event-stream",
