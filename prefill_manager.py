@@ -42,6 +42,7 @@ class PrefillManager:
         enabled: bool = True,
     ):
         self.llm = llm
+        self._llm_lock = Lock()
         self.n_tokens = n_tokens
         self.idle_ms = idle_ms
         self.enabled = enabled
