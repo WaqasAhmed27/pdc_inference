@@ -62,7 +62,7 @@ log = logging.getLogger(__name__)
 # Config
 # ---------------------------------------------------------------------------
 MODEL_PATH       = os.environ.get("MODEL_PATH",       "models/mistral-7b-instruct-v0.2.Q8_0.gguf")
-DRAFT_MODEL_PATH = os.environ.get("DRAFT_MODEL_PATH", "models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf")
+DRAFT_MODEL_PATH = os.environ.get("DRAFT_MODEL_PATH", "models/mistral-7b-instruct-v0.2.Q4_K_M.gguf")
 N_GPU_LAYERS     = int(os.environ.get("N_GPU_LAYERS",     "-1"))
 N_CTX            = int(os.environ.get("N_CTX",            "2048"))
 N_THREADS        = int(os.environ.get("N_THREADS",        "4"))

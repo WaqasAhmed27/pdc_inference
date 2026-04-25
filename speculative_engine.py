@@ -18,7 +18,7 @@ This is an important finding to report in the paper.
 
 Usage:
     engine = SpeculativeEngine(
-        draft_model_path="models/tinyllama-1.1b.Q4_K_M.gguf",
+        draft_model_path="models/mistral-7b-instruct-v0.2.Q4_K_M.gguf",
         target_model_path="models/mistral-7b-instruct-v0.2.Q8_0.gguf",
         k=4,
     )
@@ -247,7 +247,7 @@ class SpeculativeEngine:
 
             # Extract probability from logprobs if available, else use uniform fallback
             top_logprobs = logprob.get("top_logprobs", [{}]) if logprob else [{}]
-            tok_prob = np.exp(list(top_logprobs[0].values())[0]) if top_logprobs and top_logprobs[0] else 1e-6
+            tok_prob = np.exp(logprob.get("token_logprobs", [0])[0]) if logprob else 1e-6
 
             tokens.append(tok_id)
             probs.append(float(tok_prob))
@@ -287,16 +287,16 @@ class SpeculativeEngine:
         return [{}] * n
 
     def _softmax_single(self, logprob_entry, token_id: int, temperature: float) -> float:
-        """Extract probability of a specific token from a logprob entry dict."""
         if not logprob_entry or not isinstance(logprob_entry, dict):
             return 1e-6
-        # logprob_entry maps token_string -> log_prob
-        vals = list(logprob_entry.values())
-        if not vals:
-            return 1e-6
-        # Use the max logprob value as an approximation for the target token's prob
-        max_lp = max(vals)
-        return float(np.exp(max_lp))
+
+        # Find matching token string
+        for tok_str, lp in logprob_entry.items():
+            tok_ids = self.target.tokenize(tok_str.encode())
+            if tok_ids and tok_ids[0] == token_id:
+                return float(np.exp(lp))
+
+        return 1e-6
 
     def _sample_adjusted(self, logprob_entry, draft_prob: float, draft_tok: int, temp: float) -> int:
         """
