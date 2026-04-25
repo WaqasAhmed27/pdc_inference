@@ -82,14 +82,14 @@ class SpecRequest(BaseModel):
     session_id: str = "default"
     prompt: str
     max_tokens: int = 64
-    temperature: float = 0.2
+    temperature: float = 0.0
 
 class SpecRewriteRequest(BaseModel):
     session_id: str = "default"
     text: str
     instruction: str = "Improve clarity and conciseness."
     max_tokens: int = 128
-    temperature: float = 0.3
+    temperature: float = 0.0
 
 class ContextUpdate(BaseModel):
     session_id: str
